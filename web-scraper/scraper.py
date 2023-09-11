@@ -1,10 +1,3 @@
-'''
-TODO: handle special characters
-TODO: decide on format of output, (csv, json, txt, etc.) 
-      (including paragraph symbols, footnotes, where to get verse & chapter numbers?)
-TODO: error handling & logging if necessary
-'''
-
 import requests
 from bs4 import BeautifulSoup
 
@@ -25,13 +18,22 @@ def get_scripture(html):
             sup.decompose()
         # get rid of the verse number
         verse.span.decompose()
-        scripture += verse.text.replace('Â¶ ', '') + '\n'
+
+        verse_text = verse.text
+        verse_text = verse_text.replace('Â¶ ', '')
+        verse_text = ' '.join(verse_text.split())
+
+        scripture += verse_text + '\n'
     return scripture
 
 # Main function that prints verses given a book of scripture and chapter number
 def scrape(text, book, chapter):
     html = get_html(text, book, chapter)
     scripture = get_scripture(html)
+
+    if scripture[-1] == '\n':
+        scripture = scripture[:-1]
+
     return scripture
 
 
