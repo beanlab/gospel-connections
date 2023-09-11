@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 def get_html(text, book, chapter):
     url = 'https://www.churchofjesuschrist.org/study/scriptures/' + text + '/' + book + '/' + chapter + '?lang=eng'
     response = requests.get(url)
+    response.encoding = 'utf-8'
     return response.text
 
 # Get the scripture verses from the HTML
@@ -16,11 +17,13 @@ def get_scripture(html):
         # get rid of all <sup> elements, (references)
         for sup in verse.find_all('sup'):
             sup.decompose()
-        # get rid of the verse number
-        verse.span.decompose()
+        
+        # get rid of verse numbers
+        for span in verse.find_all('span', class_='verse-number'):
+            span.decompose()
 
+        # post processing
         verse_text = verse.text
-        verse_text = verse_text.replace('Â¶ ', '')
         verse_text = ' '.join(verse_text.split())
 
         scripture += verse_text + '\n'

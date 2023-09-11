@@ -18,7 +18,7 @@ for standard_work, standard_work_data in data['standard_works'].items():
             if scripture == '':
                 print('ERROR 404: ' + standard_work + ' ' + book_code + ' ' + str(chapter))
 
-            directory = 'scriptures/' + standard_work + '/' + book_code
+            directory = '../data/scriptures/' + standard_work + '/' + book_code
             if not os.path.exists(directory):
                 os.makedirs(directory)
             with open(directory + '/' + str(chapter) + '.txt', 'w') as f:
