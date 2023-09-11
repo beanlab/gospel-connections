@@ -2,8 +2,6 @@ import openai
 import tiktoken
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 
-openai.api_key = "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"
-
 ADA_2_PRICING = 0.0001
 
 def get_num_tokens(string: str, encoding_name: str) -> int:
