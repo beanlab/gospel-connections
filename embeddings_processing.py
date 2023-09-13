@@ -4,6 +4,7 @@ import os
 import tiktoken
 import numpy as np
 from tenacity import retry, wait_random_exponential, stop_after_attempt
+import time
 
 ADA_2_PRICING = 0.0001
 
@@ -14,27 +15,39 @@ else:
     openai.api_key = open("./openai_api_key.txt", "r").read()
 
 def get_num_tokens(string: str, encoding_name: str) -> int:
-    """Returns the number of tokens in a text string."""
+    # Returns the number of tokens in a text string.
+
     encoding = tiktoken.get_encoding(encoding_name)
     num_tokens = len(encoding.encode(string))
     return num_tokens
 
 
-@retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embedding(text: str, model="text-embedding-ada-002") -> list[float]:
-    """Get the embedding for a text string."""
-    return openai.Embedding.create(input=[text],
-                                   model=model)["data"][0]["embedding"]
+    # Get the embedding for a text string.
+    try:
+        embedding = openai.Embedding.create(
+            input=[text], model=model)["data"][0]["embedding"]
 
+        return embedding
+    except openai.error.RateLimitError:
+        # Handle rate limit error by waiting and then retrying
+        time.sleep(10)
+        return get_embedding(text, model)  # Retry the request
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return None
 
+  
 def process_embedding(text):
-    """Get the embedding and price for a text string."""
+    # Get the embedding and price for a text string.
     num_tokens = get_num_tokens(text, "cl100k_base")
     embedding = get_embedding(text)
-    print("embedding: ", get_embedding(text))
-    price = (float(num_tokens) / 1000) * ADA_2_PRICING
-    print("price: ", price)
-    return embedding, price, num_tokens
+    if embedding is not None:
+        # print("embedding: ", get_embedding(text))
+        price = (float(num_tokens) / 1000) * ADA_2_PRICING
+        if price >= 0.0001:
+            print("price: $", price)
+        return embedding, price, num_tokens
 
 
 def process_embeddings(token_width, file):
