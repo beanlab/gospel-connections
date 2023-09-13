@@ -49,7 +49,6 @@ def process_embeddings(token_width, file):
     # Generate embeddings for a text file and save them to one csv
     # file and their text locations to another.
     byte_index = 0
-    price = 0
     num_tokens = 0
     embeddings_list = []
     indexes_list = []
@@ -71,7 +70,7 @@ def process_embeddings(token_width, file):
         
     price = (float(num_tokens) / 1000) * ADA_2_PRICING
     
-    print('Final price: ', price)    
+    print('Final price: $', price)    
     print('Number tokens: ', num_tokens)
 
 def main():
