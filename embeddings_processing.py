@@ -1,16 +1,15 @@
-import pandas as pd
 import openai
 import os
 import tiktoken
 import numpy as np
-from tenacity import retry, wait_random_exponential, stop_after_attempt
 import time
 
 ADA_2_PRICING = 0.0001
 
 # Check for env variable of api_key, otherwise load from file
 if "OPENAI_API_KEY" in os.environ:
-    openai.api_key = os.getenv("OPENAI_API_KEY") 
+    openai.organization = os.getenv("OPENAI_ORGANIZATION_BEAN")
+    openai.api_key = os.getenv("OPENAI_API_KEY")
 else:
     openai.api_key = open("./openai_api_key.txt", "r").read()
 
@@ -43,16 +42,12 @@ def process_embedding(text):
     num_tokens = get_num_tokens(text, "cl100k_base")
     embedding = get_embedding(text)
     if embedding is not None:
-        # print("embedding: ", get_embedding(text))
-        price = (float(num_tokens) / 1000) * ADA_2_PRICING
-        if price >= 0.0001:
-            print("price: $", price)
-        return embedding, price, num_tokens
+        return embedding, num_tokens
 
 
 def process_embeddings(token_width, file):
-    """Generate embeddings for a text file and save them to one csv
-    file and their text locations to another."""
+    # Generate embeddings for a text file and save them to one csv
+    # file and their text locations to another.
     byte_index = 0
     price = 0
     num_tokens = 0
@@ -63,8 +58,7 @@ def process_embeddings(token_width, file):
         words = text.split()
         for word_index in range(len(words) - (token_width-1)): # (token_width - 1) cuts out the partial chunks at the very end of the text line
             to_embedd = " ".join(words[word_index:word_index+token_width])
-            embedding, cur_price, tokens = process_embedding(to_embedd)
-            price += cur_price
+            embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
             end_index = byte_index + len(to_embedd)
             embeddings_list.append(embedding)
@@ -74,8 +68,10 @@ def process_embeddings(token_width, file):
    
         np.savetxt('embeds.csv', np.asarray(embeddings_list), delimiter=',')
         np.savetxt('indexes.csv', np.asarray(indexes_list), delimiter=',', fmt="%i")
-
-    print('Final price: ', price)
+        
+    price = (float(num_tokens) / 1000) * ADA_2_PRICING
+    
+    print('Final price: ', price)    
     print('Number tokens: ', num_tokens)
 
 def main():
