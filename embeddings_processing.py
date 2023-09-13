@@ -5,6 +5,7 @@ import tiktoken
 import time
 
 ADA_2_PRICING = 0.0001
+openai.organization = "org-ZtSZX3D5vjn3e3lHycGDkVqU"
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 
@@ -75,4 +76,4 @@ def process_embeddings(token_width, file):
         text_df.to_csv("results/text.csv")
 
 
-process_embeddings(8, "data/test.txt")
+process_embeddings(10, "data/test.txt")
