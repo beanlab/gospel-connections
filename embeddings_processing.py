@@ -2,6 +2,7 @@ import pandas as pd
 import openai
 import os
 import tiktoken
+import numpy as np
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 
 ADA_2_PRICING = 0.0001
@@ -33,7 +34,7 @@ def process_embedding(text):
     print("embedding: ", get_embedding(text))
     price = (float(num_tokens) / 1000) * ADA_2_PRICING
     print("price: ", price)
-    return embedding, price
+    return embedding, price, num_tokens
 
 
 def process_embeddings(token_width, file):
@@ -41,26 +42,31 @@ def process_embeddings(token_width, file):
     file and their text locations to another."""
     byte_index = 0
     price = 0
-    embeddings_dict = {"embeddings": []}
-    text_dict = {"locations": []}
+    num_tokens = 0
+    embeddings_list = []
+    indexes_list = []
     with open(file) as f:
         text = f.read()
         words = text.split()
         for word_index in range(len(words) - (token_width-1)): # (token_width - 1) cuts out the partial chunks at the very end of the text line
             to_embedd = " ".join(words[word_index:word_index+token_width])
-            embeddding, cur_price = process_embedding(to_embedd)
+            embedding, cur_price, tokens = process_embedding(to_embedd)
             price += cur_price
+            num_tokens += tokens
             end_index = byte_index + len(to_embedd)
-            embeddings_dict["embeddings"].append(embeddding)
-            text_dict["locations"].append((byte_index, end_index))
+            embeddings_list.append(embedding)
+            indexes_list.append((byte_index, end_index))
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
             byte_index = byte_index + len(" ".join(words[word_index:word_index+1])) + 1
-        embedding_df = pd.DataFrame(embeddings_dict)
-        text_df = pd.DataFrame(text_dict)
-        embedding_df.to_csv("embeddings.csv")
-        text_df.to_csv("text.csv")
+   
+        np.savetxt('embeds.csv', np.asarray(embeddings_list), delimiter=',')
+        np.savetxt('indexes.csv', np.asarray(indexes_list), delimiter=',', fmt="%i")
+
+    print('Final price: ', price)
+    print('Number tokens: ', num_tokens)
 
 def main():
+    # TODO: add token_width as a parameter, etc.
     process_embeddings(3, "./data/scriptures/book_of_mormon/1-ne/1-test.txt")
 
 if __name__ == "__main__":
