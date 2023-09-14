@@ -1,5 +1,6 @@
 import openai
 import os
+import sys
 import tiktoken
 import numpy as np
 import time
@@ -74,8 +75,11 @@ def process_embeddings(token_width, file):
     print('Number tokens: ', num_tokens)
 
 def main():
-    # TODO: add token_width as a parameter, etc.
-    process_embeddings(3, "./data/scriptures/book_of_mormon/1-ne/1-test.txt")
+    if len(sys.argv) <= 1:
+        raise Exception('Requires arguments: (int) token width for sliding window, (string) data file path')
+    token_width = int(sys.argv[1])
+    file_path = sys.argv[2]
+    process_embeddings(token_width, file_path)
 
 if __name__ == "__main__":
     main()
