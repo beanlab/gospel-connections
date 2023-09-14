@@ -66,8 +66,15 @@ def process_embeddings(token_width, file):
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
             byte_index = byte_index + len(" ".join(words[word_index:word_index+1])) + 1
    
-        np.savetxt('embeds.csv', np.asarray(embeddings_list), delimiter=',')
-        np.savetxt('indexes.csv', np.asarray(indexes_list), delimiter=',', fmt="%i")
+        file_path = "/".join(file.split("/")[0:-3]) + "/embeddings/" + file.split("/")[-2] + "/"
+        file_name = file.split("/")[-1].split(".")[0]
+        file_name = file_name + ".w" + str(token_width).zfill(3)
+
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+
+        np.savetxt(file_path + file_name + ".embeddings.csv", np.asarray(embeddings_list), delimiter=',')
+        np.savetxt(file_path + file_name + ".offsets.csv", np.asarray(indexes_list), delimiter=',', fmt="%i")
         
     price = (float(num_tokens) / 1000) * ADA_2_PRICING
     
