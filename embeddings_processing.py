@@ -4,6 +4,7 @@ import sys
 import tiktoken
 import numpy as np
 import time
+from structure import scriptures_structure
 
 ADA_2_PRICING = 0.0001
 
@@ -69,6 +70,8 @@ def process_embeddings(token_width, file):
         file_path = "/".join(file.split("/")[0:-3]) + "/embeddings/" + file.split("/")[-2] + "/"
         file_name = file.split("/")[-1].split(".")[0]
         file_name = file_name + ".w" + str(token_width).zfill(3)
+        print(file_path)
+        print(file_name)
 
         if not os.path.exists(file_path):
             os.makedirs(file_path)
@@ -83,9 +86,11 @@ def process_embeddings(token_width, file):
 
 def main():
     if len(sys.argv) <= 1:
-        raise Exception('Requires arguments: (int) token width for sliding window, (string) data file path')
+        raise Exception('Requires arguments: (int) token width for sliding window, (string) book and chapter ex: 2-ne/1')
     token_width = int(sys.argv[1])
-    file_path = sys.argv[2]
+    book_chapter = sys.argv[2]
+    file_path = scriptures_structure.get_text_file_path(book_chapter)
+    print(file_path)
     process_embeddings(token_width, file_path)
 
 if __name__ == "__main__":
