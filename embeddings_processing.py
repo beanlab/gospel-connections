@@ -4,6 +4,7 @@ import sys
 import tiktoken
 import numpy as np
 import time
+from tqdm import tqdm
 from structure import scriptures_structure
 
 ADA_2_PRICING = 0.0001
@@ -57,7 +58,7 @@ def process_embeddings(token_width, file):
     with open(file) as f:
         text = f.read()
         words = text.split()
-        for word_index in range(len(words) - (token_width-1)): # (token_width - 1) cuts out the partial chunks at the very end of the text line
+        for word_index in tqdm(range(len(words) - (token_width-1))): # (token_width - 1) cuts out the partial chunks at the very end of the text line
             to_embedd = " ".join(words[word_index:word_index+token_width])
             embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
