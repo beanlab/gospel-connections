@@ -60,11 +60,13 @@ def process_embeddings(token_width, file):
         words = text.split()
         for word_index in tqdm(range(len(words) - (token_width-1))): # (token_width - 1) cuts out the partial chunks at the very end of the text line
             to_embedd = " ".join(words[word_index:word_index+token_width])
+            print(to_embedd)
             embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
             end_index = byte_index + len(to_embedd)
             embeddings_list.append(embedding)
-            indexes_list.append((byte_index, end_index))
+            line_number = text.count("\n", 0, byte_index) + 1
+            indexes_list.append((byte_index, end_index, line_number))
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
             byte_index = byte_index + len(" ".join(words[word_index:word_index+1])) + 1
    
