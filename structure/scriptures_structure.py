@@ -107,18 +107,19 @@ def get_text_file_path(book_chapter):
 def get_embedding_file_path(book_chapter_width):
     book = book_chapter_width.split("/")[0]
     chapter = book_chapter_width.split("/")[1].zfill(3)
-    width = book_chapter_width.split("/")[2]
+    width = book_chapter_width.split("/")[2].zfill(3)
+    increment = book_chapter_width.split("/")[3].zfill(3)
     if book in BOOK_OF_MORMON:
-        return ("data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".embeddings.txt",
-                "data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".offsets.txt")
+        return ("data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
+                "data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
     elif book in NEW_TESTAMENT:
-        return ("data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".embeddings.txt",
-                "data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".offsets.txt")
+        return ("data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
+                "data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
     elif book in OLD_TESTAMENT:
-        return ("data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".embeddings.txt",
-                "data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".offsets.txt")
+        return ("data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
+                "data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
     elif book in PEARL_OF_GREAT_PRICE:
-        return ("data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".embeddings.txt",
-                "data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".offsets.txt")
+        return ("data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
+                "data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
     else:
         raise Exception('Invalid book and chapter: ' + book_chapter_width)

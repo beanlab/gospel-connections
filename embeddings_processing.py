@@ -48,7 +48,7 @@ def process_embedding(text):
         return embedding, num_tokens
 
 
-def process_embeddings(token_width, file):
+def process_embeddings(token_width, file, sliding_window_increment):
     # Generate embeddings for a text file and save them to one csv
     # file and their text locations to another.
     byte_index = 0
@@ -58,9 +58,9 @@ def process_embeddings(token_width, file):
     with open(file) as f:
         text = f.read()
         words = text.split()
-        for word_index in tqdm(range(len(words) - (token_width-1))): # (token_width - 1) cuts out the partial chunks at the very end of the text line
+        # (token_width - sliding_window_increment) cuts out the partial chunks at the very end of the text line
+        for word_index in tqdm(range(0, len(words) - (token_width-sliding_window_increment), sliding_window_increment)): 
             to_embedd = " ".join(words[word_index:word_index+token_width])
-            print(to_embedd)
             embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
             end_index = byte_index + len(to_embedd)
@@ -68,11 +68,11 @@ def process_embeddings(token_width, file):
             line_number = text.count("\n", 0, byte_index) + 1
             indexes_list.append((byte_index, end_index, line_number))
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
-            byte_index = byte_index + len(" ".join(words[word_index:word_index+1])) + 1
+            byte_index = byte_index + len(" ".join(words[word_index:word_index+sliding_window_increment])) + 1
    
         file_path = "/".join(file.split("/")[0:-3]) + "/embeddings/" + file.split("/")[-2] + "/"
         file_name = file.split("/")[-1].split(".")[0]
-        file_name = file_name + ".w" + str(token_width).zfill(3)
+        file_name = file_name + ".w" + str(token_width).zfill(3) + ".i" + str(sliding_window_increment).zfill(3)
         print(file_path)
         print(file_name)
 
@@ -88,13 +88,14 @@ def process_embeddings(token_width, file):
     print('Number tokens: ', num_tokens)
 
 def main():
-    if len(sys.argv) <= 1:
-        raise Exception('Requires arguments: (int) token width for sliding window, (string) book and chapter ex: 2-ne/1')
+    if len(sys.argv) < 4:
+        raise Exception('Requires arguments: (int) token width for sliding window, (string) book and chapter ex: 2-ne/1, (int) sliding window increment')
     token_width = int(sys.argv[1])
     book_chapter = sys.argv[2]
+    sliding_window_increment = int(sys.argv[3])
     file_path = scriptures_structure.get_text_file_path(book_chapter)
     print(file_path)
-    process_embeddings(token_width, file_path)
+    process_embeddings(token_width, file_path, sliding_window_increment)
 
 if __name__ == "__main__":
     main()
