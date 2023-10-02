@@ -3,7 +3,7 @@ api_key/
 results/
 
 # Byte-compiled / optimized / DLL files
-lib_utils/__pycache__/
+lib_processing/__pycache__/
 structure/__pycache__/
 __pycache__/
 *.py[cod]
