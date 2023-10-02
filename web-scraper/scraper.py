@@ -23,7 +23,7 @@ def get_scripture(html):
             span.decompose()
 
         # post processing
-        verse_text = verse.text
+        verse_text = verse.text.replace('¶ ', '')
         verse_text = ' '.join(verse_text.split())
 
         scripture += verse_text + '\n'

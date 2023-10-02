@@ -99,8 +99,7 @@
         "doctrine_and_covenants": {
             "code": "dc-testament",
             "books": [
-                { "code": "dc", "chapters": 138 },
-                { "code": "od", "chapters": 2 }
+                { "code": "dc", "chapters": 138 }
             ]
         },
         "pearl_of_great_price": {
