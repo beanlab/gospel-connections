@@ -80,6 +80,7 @@ def process_embeddings(token_width, file, sliding_window_increment):
                     print("line:", line)
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
             v= " ".join(words[word_index:word_index+sliding_window_increment])
+            print('v', v, "+")
             byte_index = byte_index + len(" ".join(words[word_index:word_index+sliding_window_increment])) + 1
     
         file_path = "/".join(file.split("/")[0:-3]) + "/embeddings/" + file.split("/")[-2] + "/"

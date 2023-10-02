@@ -1,19 +1,13 @@
-from bs4 import BeautifulSoup
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
-from sklearn.mixture import GaussianMixture
-import plotly.graph_objects as go
 import pandas as pd
 import sys
+import os
 
 sys.path.append(".")
-from structure import scriptures_structure
+from lib_utils import scriptures_structure
 
-
-alma_32_files = scriptures_structure.get_embedding_file_path('alma/32/40/20') 
-alma_32_embedds = pd.read_csv("./" + alma_32_files[0], header=None).to_numpy()
-alma_32_offsets = pd.read_csv("./" + alma_32_files[1], header=None).to_numpy()
-
+os.environ['OMP_NUM_THREADS'] = '1'
 
 def get_texts_from_offset(offsets, book_chapter):
     text_array = []
@@ -44,40 +38,97 @@ def convert_all_text(text):
         text[i] = convert_text(text[i])
     return text
 
-
-text = get_texts_from_offset(alma_32_offsets, 'alma/32')
-
-pca = PCA(n_components=2)
-reduced_embeddings = pca.fit_transform(alma_32_embedds)
-
-kmeans = KMeans(n_clusters=3, random_state=0).fit(reduced_embeddings)
-cluster_labels = kmeans.labels_
-
-data = {'x': reduced_embeddings[:, 0],
-        'y': reduced_embeddings[:, 1],
-        'text_labels': convert_all_text(text),
-        'cluster_labels': cluster_labels}
-df = pd.DataFrame(data)
-
-html_strings = []
-# for i, text_point in enumerate(text):  # Replace 'text_data' with your text data
-#     cluster_label = cluster_labels[i]
-#     highlighted_text = f'<span class="cluster-{cluster_label}">{text_point}</span>'
-#     html_strings.append(highlighted_text)
+def visualize_clusters(original_text, segments, cluster_assignments, cluster_colors, book_chapter_width_window):
+    # Initialize a list of colors for each character in the original text
+    colors_for_chars = [''] * len(original_text)
+    verses = []
+    book_chapter = ' '.join(book_chapter_width_window.split("/")[:2])
     
+    # Iterate over each segment and apply color
+    for (start, end, verse), cluster in zip(segments, cluster_assignments):
+        color = cluster_colors[cluster]
+        verses.append(verse)
+        # if verse not in verse_start_indices:
+            # verse_start_indices[verse] = start
+        for i in range(start, min(end, len(original_text))):
+            colors_for_chars[i] = color
+    
+    highlighted_text = []
+    additional_length = 0 
+    last_color = '' 
+    verse = 1
+    highlighted_text.append(f'<div><span style="font-weight:bold;"> {book_chapter} </span>') 
+    for i, char in enumerate(original_text):
+        # print("i", i)
+        # print("char", char)
+        color = colors_for_chars[i]
+        
+        # if i in verse_start_indices:
+        #     verse_number = verse_start_indices[i]
+        if i == 0 or original_text[i-1] == '\n':
+            highlighted_text.append('</span>')
+            highlighted_text.append(f'<div><span style="font-weight:bold;">{verse} </span>')
+            additional_length += len(str(verse)) + len('<div><span style="font-weight:bold;"></span>')
+            highlighted_text.append(f'<span style="background-color: {color};">')
+            
+            verse += 1  
+        
+        
+        # if i + additional_length < len(original_text) + additional_l 
+        if color != last_color:  # Start a new span whenever color changes
+            if last_color:  # Close the last span
+                highlighted_text.append('</span>')
+            highlighted_text.append(f'<span style="background-color: {color};">')
+        highlighted_text.append(char)
+        last_color = color
+        
+        if char == '\n':
+            highlighted_text.append('</div>')
+    highlighted_text.append('</span>')  # Close the final span
+    highlighted_text.append('</div>')
+    # Display the highlighted text
+    name = '_'.join(book_chapter_width_window.split("/"))
+    with open(f'{name}.html', 'w', encoding='utf-8') as html_file:
+        html_file.write(''.join(highlighted_text))
+    # display(HTML(''.join(highlighted_text)))
 
-# html_content = "<html><head><style>.cluster-0{color:red;}.cluster-1{color:blue;}.cluster-2{color:green;}.cluster-3{color:orange;}.cluster-4{color:purple;}</style></head><body>"
-# html_content += "<br>".join(html_strings)
-# html_content += "</body></html>"
+# For each segment, compute embeddings, perform clustering and visualize
+# Example usage (you will need to replace with actual clustering results):
 
-html_content = "<html><head><style>.highlight-0{background-color:lightblue;}.highlight-1{background-color:blue;}.highlight-2{background-color:green;}.highlight-3{background-color:orange;}.highlight-4{background-color:purple;}</style></head><body>"
-for i, text_point in enumerate(text):  # Replace 'text_data' with your text data
-    cluster_label = cluster_labels[i]
-    highlighted_text = f'<span class="highlight-{cluster_label}">{text_point}</span>'
-    html_content += highlighted_text + "<br>"
-html_content += "</body></html>"
+def create_clusters(book_chapter_width_window):
+    files = scriptures_structure.get_embedding_file_path(book_chapter_width_window) 
+    embedds = pd.read_csv("./" + files[0], header=None).to_numpy()
+    offsets = pd.read_csv("./" + files[1], header=None).to_numpy()
 
+    book_chapter = '/'.join(book_chapter_width_window.split("/")[:2])
+    text_file = "./" + scriptures_structure.get_text_file_path(book_chapter)
+    with open(text_file, 'r', encoding='utf-8') as file:
+        contents = file.read()
 
-# Save the HTML content to a file
-with open('clustered_text.html', 'w', encoding='utf-8') as html_file:
-    html_file.write(html_content)
+    text = get_texts_from_offset(offsets, book_chapter)
+
+    pca = PCA(n_components=2)
+    reduced_embeddings = pca.fit_transform(embedds)
+
+    kmeans = KMeans(n_clusters=3, random_state=0).fit(reduced_embeddings)
+    cluster_labels = kmeans.labels_
+
+    data = {'x': reduced_embeddings[:, 0],
+            'y': reduced_embeddings[:, 1],
+            'text_labels': convert_all_text(text),
+            'cluster_labels': cluster_labels}
+    df = pd.DataFrame(data)
+
+    cluster_colors = ['lightblue', 'lightgreen', 'lightpink']
+
+    segments = [(row[0], row[1], row[2]) for row in offsets]
+    visualize_clusters(contents, segments, cluster_labels, cluster_colors, book_chapter_width_window)
+
+def main():
+    if len(sys.argv) < 2:
+        raise Exception('Requires arguments: (string) book/chapter/token_width/sliding_window  ex: 2-ne/40/20')
+    book_chapter_width_window = sys.argv[1]
+    create_clusters(book_chapter_width_window)
+
+if __name__ == "__main__":
+    main()
