@@ -5,7 +5,7 @@ import tiktoken
 import numpy as np
 import time
 from tqdm import tqdm
-from structure import scriptures_structure
+from lib_utils import scriptures_structure
 
 ADA_2_PRICING = 0.0001
 
@@ -60,9 +60,6 @@ def process_embeddings(token_width, file, sliding_window_increment):
         words = text.split()
         # (token_width - sliding_window_increment) cuts out the partial chunks at the very end of the text line
         for word_index in tqdm(range(0, len(words) - (token_width-sliding_window_increment), sliding_window_increment)): 
-            # print(words[word_index:word_index+token_width])
-            print("word_index:", word_index)
-            print(words[word_index])
             to_embedd = " ".join(words[word_index:word_index+token_width])
             embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
@@ -73,11 +70,6 @@ def process_embeddings(token_width, file, sliding_window_increment):
             with open(file) as fi:
                 fi.seek(byte_index)
                 line = fi.read(end_index - byte_index)
-                if to_embedd == line:
-                    print("Match")
-                else:
-                    print("to_embedd:", to_embedd)
-                    print("line:", line)
             # Update the starting byte index by finding the length of the next word, adding one for the space, and adding that length to the current byte index
             v= " ".join(words[word_index:word_index+sliding_window_increment])
             print('v', v, "+")
