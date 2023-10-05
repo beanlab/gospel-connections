@@ -5,7 +5,10 @@ import sys
 import os
 
 sys.path.append(".")
-from lib_utils import scriptures_structure
+from lib_processing import scriptures_structure
+from lib_processing import render
+from lib_processing.render import Render
+# from lib_processing import generate_html
 
 os.environ['OMP_NUM_THREADS'] = '1'
 
@@ -94,8 +97,13 @@ def visualize_clusters(original_text, segments, cluster_assignments, cluster_col
 
 # For each segment, compute embeddings, perform clustering and visualize
 # Example usage (you will need to replace with actual clustering results):
+def make_dict(clusters):
+    unique_numbers = set(clusters)
+    result = {num: [1 if x == num else 0 for x in clusters] for num in unique_numbers}
+    return result
 
-def create_clusters(book_chapter_width_window):
+
+def create_clusters(book_chapter_width_window,  render: Render):
     files = scriptures_structure.get_embedding_file_path(book_chapter_width_window) 
     embedds = pd.read_csv("./" + files[0], header=None).to_numpy()
     offsets = pd.read_csv("./" + files[1], header=None).to_numpy()
@@ -122,13 +130,21 @@ def create_clusters(book_chapter_width_window):
     cluster_colors = ['lightblue', 'lightgreen', 'lightpink']
 
     segments = [(row[0], row[1], row[2]) for row in offsets]
-    visualize_clusters(contents, segments, cluster_labels, cluster_colors, book_chapter_width_window)
+    groups = [{group: 1} for group in cluster_labels]
+
+    with open(text_file, 'r', encoding='utf-8') as file:
+        text = file.read()
+    
+    render(text, segments, groups, book_chapter)
+    
+    
+    # visualize_clusters(contents, segments, cluster_labels, cluster_colors, book_chapter_width_window)
 
 def main():
     if len(sys.argv) < 2:
-        raise Exception('Requires arguments: (string) book/chapter/token_width/sliding_window  ex: 2-ne/40/20')
+        raise Exception('Requires arguments: (string) book/chapter/token_width/sliding_window  ex: 2-ne/8/40/20')
     book_chapter_width_window = sys.argv[1]
-    create_clusters(book_chapter_width_window)
+    create_clusters(book_chapter_width_window, render.render_html)
 
 if __name__ == "__main__":
     main()

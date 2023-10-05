@@ -123,3 +123,12 @@ def get_embedding_file_path(book_chapter_width):
                 "data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
     else:
         raise Exception('Invalid book and chapter: ' + book_chapter_width)
+
+def get_texts_from_offset(offsets, book_chapter):
+    text_array = []
+    text_file = "./" + get_text_file_path(book_chapter)
+    with open(text_file, 'r', encoding='utf-8') as file:
+        contents = file.read()
+        for offset in offsets:
+            text_array.append(contents[offset[0]:offset[1]])
+    return text_array
