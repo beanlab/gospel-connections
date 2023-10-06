@@ -41,59 +41,6 @@ def convert_all_text(text):
         text[i] = convert_text(text[i])
     return text
 
-def visualize_clusters(original_text, segments, cluster_assignments, cluster_colors, book_chapter_width_window):
-    # Initialize a list of colors for each character in the original text
-    colors_for_chars = [''] * len(original_text)
-    verses = []
-    book_chapter = ' '.join(book_chapter_width_window.split("/")[:2])
-    
-    # Iterate over each segment and apply color
-    for (start, end, verse), cluster in zip(segments, cluster_assignments):
-        color = cluster_colors[cluster]
-        verses.append(verse)
-        # if verse not in verse_start_indices:
-            # verse_start_indices[verse] = start
-        for i in range(start, min(end, len(original_text))):
-            colors_for_chars[i] = color
-    
-    highlighted_text = []
-    additional_length = 0 
-    last_color = '' 
-    verse = 1
-    highlighted_text.append(f'<div><span style="font-weight:bold;"> {book_chapter} </span>') 
-    for i, char in enumerate(original_text):
-        # print("i", i)
-        # print("char", char)
-        color = colors_for_chars[i]
-        
-        # if i in verse_start_indices:
-        #     verse_number = verse_start_indices[i]
-        if i == 0 or original_text[i-1] == '\n':
-            highlighted_text.append('</span>')
-            highlighted_text.append(f'<div><span style="font-weight:bold;">{verse} </span>')
-            additional_length += len(str(verse)) + len('<div><span style="font-weight:bold;"></span>')
-            highlighted_text.append(f'<span style="background-color: {color};">')
-            
-            verse += 1  
-        
-        
-        # if i + additional_length < len(original_text) + additional_l 
-        if color != last_color:  # Start a new span whenever color changes
-            if last_color:  # Close the last span
-                highlighted_text.append('</span>')
-            highlighted_text.append(f'<span style="background-color: {color};">')
-        highlighted_text.append(char)
-        last_color = color
-        
-        if char == '\n':
-            highlighted_text.append('</div>')
-    highlighted_text.append('</span>')  # Close the final span
-    highlighted_text.append('</div>')
-    # Display the highlighted text
-    name = '_'.join(book_chapter_width_window.split("/"))
-    with open(f'{name}.html', 'w', encoding='utf-8') as html_file:
-        html_file.write(''.join(highlighted_text))
-    # display(HTML(''.join(highlighted_text)))
 
 # For each segment, compute embeddings, perform clustering and visualize
 # Example usage (you will need to replace with actual clustering results):
@@ -112,6 +59,7 @@ def create_clusters(book_chapter_width_window,  render: Render):
     text_file = "./" + scriptures_structure.get_text_file_path(book_chapter)
     with open(text_file, 'r', encoding='utf-8') as file:
         contents = file.read()
+        # print(contents)
 
     text = get_texts_from_offset(offsets, book_chapter)
 
@@ -127,18 +75,18 @@ def create_clusters(book_chapter_width_window,  render: Render):
             'cluster_labels': cluster_labels}
     df = pd.DataFrame(data)
 
-    cluster_colors = ['lightblue', 'lightgreen', 'lightpink']
-
     segments = [(row[0], row[1], row[2]) for row in offsets]
-    groups = [{group: 1} for group in cluster_labels]
+    
+    dict_groups = {}
+    for i, group in enumerate(cluster_labels):
+        if i not in dict_groups:
+            dict_groups[i] = {}
+        dict_groups[i][group] = 1
 
-    with open(text_file, 'r', encoding='utf-8') as file:
-        text = file.read()
+    list_groups = [{group: 1} for group in cluster_labels]
     
-    render(text, segments, groups, book_chapter)
+    render(contents, segments, list_groups, book_chapter)
     
-    
-    # visualize_clusters(contents, segments, cluster_labels, cluster_colors, book_chapter_width_window)
 
 def main():
     if len(sys.argv) < 2:
