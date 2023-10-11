@@ -93,13 +93,13 @@ def get_text_file_path(book_chapter):
     book = book_chapter.split("/")[0]
     chapter = book_chapter.split("/")[1].zfill(3)
     if book in BOOK_OF_MORMON:
-        return "data/scriptures/book_of_mormon/text/" + book + "/" + chapter + ".txt"
+        return "data/text/scriptures/book_of_mormon/" + book + "/" + chapter + ".txt"
     elif book in NEW_TESTAMENT:
-        return "data/scriptures/new_testament/text/" + book + "/" + chapter + ".txt"
+        return "data/text/scriptures/new_testament/" + book + "/" + chapter + ".txt"
     elif book in OLD_TESTAMENT:
-        return "data/scriptures/old_testament/text/" + book + "/" + chapter + ".txt"
+        return "data/text/scriptures/old_testament/" + book + "/" + chapter + ".txt"
     elif book in PEARL_OF_GREAT_PRICE:
-        return "data/scriptures/pearl_of_great_price/text/" + book + "/" + chapter + ".txt"
+        return "data/text/scriptures/pearl_of_great_price/" + book + "/" + chapter + ".txt"
     else:
         raise Exception('Invalid book and chapter: ' + book_chapter)
 
@@ -110,16 +110,16 @@ def get_embedding_file_path(book_chapter_width):
     width = book_chapter_width.split("/")[2].zfill(3)
     increment = book_chapter_width.split("/")[3].zfill(3)
     if book in BOOK_OF_MORMON:
-        return ("data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
-                "data/scriptures/book_of_mormon/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
+        return ("data/embeddings/w" + width + "_i" + increment + "/scriptures/book_of_mormon/" + book + "/" + chapter + ".embeddings.csv",
+                "data/embeddings/w" + width + "_i" + increment + "/scriptures/book_of_mormon/" + book + "/" + chapter + ".offsets.csv")
     elif book in NEW_TESTAMENT:
-        return ("data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
-                "data/scriptures/new_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
+        return ("data/embeddings/w" + width + "_i" + increment + "/scriptures/new_testament/" + book + "/" + chapter + ".embeddings.csv",
+                "data/embeddings/w" + width + "_i" + increment + "/scriptures/new_testament/" + book + "/" + chapter + ".offsets.csv")
     elif book in OLD_TESTAMENT:
-        return ("data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
-                "data/scriptures/old_testament/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
+        return ("data/embeddings/w" + width + "_i" + increment + "/scriptures/old_testament/" + book + "/" + chapter + ".embeddings.csv",
+                "data/embeddings/w" + width + "_i" + increment + "/scriptures/old_testament/" + book + "/" + chapter + ".offsets.csv")
     elif book in PEARL_OF_GREAT_PRICE:
-        return ("data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".embeddings.csv",
-                "data/scriptures/pearl_of_great_price/embeddings/" + book + "/" + chapter + ".w" + width + ".i" + increment + ".offsets.csv")
+        return ("data/embeddings/w" + width + "_i" + increment + "/scriptures/pearl_of_great_price/" + book + "/" + chapter + ".embeddings.csv",
+                "data/embeddings/w" + width + "_i" + increment + "/scriptures/pearl_of_great_price/" + book + "/" + chapter + ".offsets.csv")
     else:
         raise Exception('Invalid book and chapter: ' + book_chapter_width)
