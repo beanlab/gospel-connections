@@ -1,0 +1,116 @@
+{
+    "standard_works": {
+        "old_testament": {
+            "code": "ot",
+            "books": [
+                { "code": "gen", "chapters": 50 },
+                { "code": "ex", "chapters": 40 },
+                { "code": "lev", "chapters": 27 },
+                { "code": "num", "chapters": 36 },
+                { "code": "deut", "chapters": 34 },
+                { "code": "josh", "chapters": 24 },
+                { "code": "judg", "chapters": 21 },
+                { "code": "ruth", "chapters": 4 },
+                { "code": "1-sam", "chapters": 31 },
+                { "code": "2-sam", "chapters": 24 },
+                { "code": "1-kgs", "chapters": 22 },
+                { "code": "2-kgs", "chapters": 25 },
+                { "code": "1-chr", "chapters": 29 },
+                { "code": "2-chr", "chapters": 36 },
+                { "code": "ezra", "chapters": 10 },
+                { "code": "neh", "chapters": 13 },
+                { "code": "esth", "chapters": 10 },
+                { "code": "job", "chapters": 42 },
+                { "code": "ps", "chapters": 150 },
+                { "code": "prov", "chapters": 31 },
+                { "code": "eccl", "chapters": 12 },
+                { "code": "song", "chapters": 8 },
+                { "code": "isa", "chapters": 66 },
+                { "code": "jer", "chapters": 52 },
+                { "code": "lam", "chapters": 5 },
+                { "code": "ezek", "chapters": 48 },
+                { "code": "dan", "chapters": 12 },
+                { "code": "hosea", "chapters": 14 },
+                { "code": "joel", "chapters": 3 },
+                { "code": "amos", "chapters": 9 },
+                { "code": "obad", "chapters": 1 },
+                { "code": "jonah", "chapters": 4 },
+                { "code": "micah", "chapters": 7 },
+                { "code": "nahum", "chapters": 3 },
+                { "code": "hab", "chapters": 3 },
+                { "code": "zeph", "chapters": 3 },
+                { "code": "hag", "chapters": 2 },
+                { "code": "zech", "chapters": 14 },
+                { "code": "mal", "chapters": 4 }
+            ]
+        },
+        "new_testament": {
+            "code": "nt",
+            "books": [
+                { "code": "matt", "chapters": 28 },
+                { "code": "mark", "chapters": 16 },
+                { "code": "luke", "chapters": 24 },
+                { "code": "john", "chapters": 21 },
+                { "code": "acts", "chapters": 28 },
+                { "code": "rom", "chapters": 16 },
+                { "code": "1-cor", "chapters": 16 },
+                { "code": "2-cor", "chapters": 13 },
+                { "code": "gal", "chapters": 6 },
+                { "code": "eph", "chapters": 6 },
+                { "code": "philip", "chapters": 4 },
+                { "code": "col", "chapters": 4 },
+                { "code": "1-thes", "chapters": 5 },
+                { "code": "2-thes", "chapters": 3 },
+                { "code": "1-tim", "chapters": 6 },
+                { "code": "2-tim", "chapters": 4 },
+                { "code": "titus", "chapters": 3 },
+                { "code": "philem", "chapters": 1 },
+                { "code": "heb", "chapters": 13 },
+                { "code": "james", "chapters": 5 },
+                { "code": "1-pet", "chapters": 5 },
+                { "code": "2-pet", "chapters": 3 },
+                { "code": "1-jn", "chapters": 5 },
+                { "code": "2-jn", "chapters": 1 },
+                { "code": "3-jn", "chapters": 1 },
+                { "code": "jude", "chapters": 1 },
+                { "code": "rev", "chapters": 22 }
+            ]
+        },
+        "book_of_mormon": {
+            "code": "bofm",
+            "books": [
+                { "code": "1-ne", "chapters": 22 },
+                { "code": "2-ne", "chapters": 33 },
+                { "code": "jacob", "chapters": 7 },
+                { "code": "enos", "chapters": 1 },
+                { "code": "jarom", "chapters": 1 },
+                { "code": "omni", "chapters": 1 },
+                { "code": "w-of-m", "chapters": 1 },
+                { "code": "mosiah", "chapters": 29 },
+                { "code": "alma", "chapters": 63 },
+                { "code": "hel", "chapters": 16 },
+                { "code": "3-ne", "chapters": 30 },
+                { "code": "4-ne", "chapters": 1 },
+                { "code": "morm", "chapters": 9 },
+                { "code": "ether", "chapters": 15 },
+                { "code": "moro", "chapters": 10 }
+            ]
+        },
+        "doctrine_and_covenants": {
+            "code": "dc-testament",
+            "books": [
+                { "code": "dc", "chapters": 138 }
+            ]
+        },
+        "pearl_of_great_price": {
+            "code": "pgp",
+            "books": [
+                { "code": "moses", "chapters": 8 },
+                { "code": "abr", "chapters": 5 },
+                { "code": "js-m", "chapters": 1 },
+                { "code": "js-h", "chapters": 1 },
+                { "code": "a-of-f", "chapters": 1 }
+            ]
+        }
+    }
+}
