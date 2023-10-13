@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import matplotlib
 import matplotlib as mpl
 import plotly.express as px
-from structure import scriptures_structure
 import pandas as pd
 import os
 
@@ -44,11 +43,11 @@ def create_heatmap(cos_sim, indexes_1, indexes_2, text_1, text_2, threshold):
     im = px.imshow(cos_sim[:length_1, :length_2],
                 x=labels_2, 
                 y=labels_1,
-                width=1500,
-                height=1000,
+                width=750,
+                height=750,
                 text_auto=False,
                 zmin=threshold,
-                color_continuous_scale='Greys')
+                color_continuous_scale='viridis')
 
     im.update_xaxes(showticklabels=False)
     im.update_yaxes(showticklabels=False)
