@@ -61,8 +61,15 @@ def process_embeddings(file, token_width, sliding_window_increment):
     with open(file) as f:
         text = f.read()
         words = text.split()
+
+        # Just do entire sequence if len(words) < increment
+        if len(words) < sliding_window_increment:
+            loop_range = len(words)
+        else:
+            loop_range = len(words) - (token_width - sliding_window_increment)
+
         # (token_width - sliding_window_increment) cuts out the partial chunks at the very end of the text line
-        for word_index in tqdm(range(0, len(words) - (token_width-sliding_window_increment), sliding_window_increment)): 
+        for word_index in tqdm(range(0, loop_range, sliding_window_increment)): 
             to_embedd = " ".join(words[word_index:word_index+token_width])
             embedding, tokens = process_embedding(to_embedd)
             num_tokens += tokens
@@ -75,9 +82,12 @@ def process_embeddings(file, token_width, sliding_window_increment):
     
         # Peform mean transform
         embeddings_list = np.asarray(embeddings_list)
-        embeddings_mean = np.mean(embeddings_list, axis=0).tolist()
-        #if embeddings_list.shape[0] > 1:
-        #    embeddings_list = embeddings_list - np.mean(embeddings_list, axis=0)
+
+        # Check if there's more than one embedding
+        if embeddings_list.shape[0] > 1:
+            embeddings_mean = np.mean(embeddings_list, axis=0).tolist()
+        else:
+            embeddings_mean = embeddings_list[0].tolist()
 
         new_file_path = ("/".join(file.split("/")[0:-1]).replace("text", "embeddings/w"+ str(token_width).zfill(3) + "_i" + str(sliding_window_increment).zfill(3) , 1))
         file_name = file.split("/")[-1].split(".")[0]
