@@ -46,7 +46,5 @@ def generate_conference_text(year, month):
         directory = "../../data/text/conference/" + str(year) + "_" + str(month)
         if not os.path.exists(directory):
             os.makedirs(directory)
-        with open(directory + "/" + title + "_" + speaker + ".txt", "w") as f:
+        with open(directory + "/" + title.replace(" ", "_") + "_" + speaker + ".txt", "w") as f:
             f.write(text)
-
-generate_conference_text(2023, 10)
