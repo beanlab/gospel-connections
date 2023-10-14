@@ -34,7 +34,25 @@ def explore(coordinate, cluster_coordinates, cluster_values, thresholded_coordin
         elif (i, j-1) in thresholded_coordinates and (i, j-1) not in cluster_coordinates:
             explore((i, j-1), cluster_coordinates, cluster_values, thresholded_coordinates, thresholded_values)
 
-def create_heatmap(cos_sim, indexes_1, indexes_2, text_1, text_2, threshold):
+def create_heatmap(cos_sim: np.array, 
+                   indexes_1: np.array, 
+                   indexes_2: np.array, 
+                   text_1: str, 
+                   text_2: str, 
+                   threshold: int):
+    """
+    Creates heatmap based on cos_sim values 
+
+    cos_sim: 2d numpy array containing cosine similarity values
+    indexes_1 - index offsets file for first data
+    indexes_2 - index offsets file for second data
+    text_1 - raw text for first data
+    text_2 - raw text for second data
+    threshold - zmin to use with heatmap; all values below threshold will be considered zero visually
+    
+    Ex:
+    create_heatmap.create_heatmap(cos_sim_norm, offs, offs, text, text, 0)
+    """
     length_1 = cos_sim.shape[0]
     length_2 = cos_sim.shape[1]
     labels_1 = generate_all_labels(length_1, indexes_1, text_1)
@@ -57,7 +75,28 @@ def create_heatmap(cos_sim, indexes_1, indexes_2, text_1, text_2, threshold):
     plt.figure()
     plt.hist(cos_sim.flatten(), bins=50)
     
-def get_top_matches(cos_sim, indexes_1, indexes_2, text_1, text_2, threshold):
+def get_top_matches(cos_sim: np.array, 
+                    indexes_1: np.array, 
+                    indexes_2: np.array, 
+                    text_1: str, 
+                    text_2: str, 
+                    threshold: int) -> np.array:
+    """
+    Performs a search across array to filter n top cosine values based on threshold
+    
+    cos_sim: 2d numpy array containing cosine similarity values
+    indexes_1 - index offsets file for first data
+    indexes_2 - index offsets file for second data
+    text_1 - raw text for first data
+    text_2 - raw text for second data
+    threshold - all cosine values below threshold will automatically be filtered out, and not searched
+
+    Returns: np.array representing new cosine similarity matrix, with matches maxed.
+
+    Ex:
+    cos_sim_cluster_max = create_heatmap.get_top_matches(cos_sim_norm, offs, offs, text, text, 0.5)
+    create_heatmap.create_heatmap(cos_sim_cluster_max, offs, offs, text, text, 0)
+    """
     thresholded_values = []
     thresholded_coordinates = []
     result_dict = {}
