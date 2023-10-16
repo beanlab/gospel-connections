@@ -1,6 +1,9 @@
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 from sklearn.decomposition import PCA
+from scipy.spatial import distance
 import pandas as pd
+import numpy as np
 import sys
 import os
 
@@ -63,19 +66,51 @@ def create_clusters(book_chapter_width_window,  render: Render):
 
     text = get_texts_from_offset(offsets, book_chapter)
 
-    pca = PCA(n_components=2)
-    reduced_embeddings = pca.fit_transform(embedds)
+    # pca = PCA(n_components=2)
+    # reduced_embeddings = pca.fit_transform(embedds)
+    cluster_range = range(2, 11)
 
-    kmeans = KMeans(n_clusters=3, random_state=0).fit(reduced_embeddings)
+    best_score = -1
+    best_num_clusters = 0
+
+    # Calculate Silhouette Score for each cluster number
+    for n_clusters in cluster_range:
+        kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(embedds)
+        labels = kmeans.labels_
+        score = silhouette_score(embedds, labels)
+        
+        if score > best_score:
+            best_score = score
+            best_num_clusters = n_clusters
+
+    kmeans = KMeans(n_clusters=best_num_clusters, random_state=0).fit(embedds)
     cluster_labels = kmeans.labels_
+    centroids = kmeans.cluster_centers_
+    new_offsets = []
+    new_cluster_assignments = []
 
-    data = {'x': reduced_embeddings[:, 0],
-            'y': reduced_embeddings[:, 1],
+    new_cluster_assignments.append(1)
+    new_offsets.append((offsets[0][0], int(offsets[0][1]/2), offsets[0][2]))
+    for i in range(len(embedds) - 1):
+            # Compute the mean of the pair
+            mean_embedding = (embedds[i] + embedds[i + 1]) / 2.0
+            
+            # Find the nearest cluster center for the mean embedding
+            nearest_centroid_idx = np.argmin([distance.euclidean(mean_embedding, centroid) for centroid in centroids])
+            
+            # Append to our new cluster assignments list
+            new_offsets.append((new_offsets[i-1][1], offsets[i][1], offsets[0][2]))
+            new_cluster_assignments.append(nearest_centroid_idx + 1)
+    print(new_cluster_assignments)
+
+
+    data = {'x': embedds[:, 0],
+            'y': embedds[:, 1],
             'text_labels': convert_all_text(text),
             'cluster_labels': cluster_labels}
     df = pd.DataFrame(data)
 
-    segments = [(row[0], row[1], row[2]) for row in offsets]
+    segments = [(row[0], row[1], row[2]) for row in new_offsets]
     
     dict_groups = {}
     for i, group in enumerate(cluster_labels):
@@ -83,7 +118,7 @@ def create_clusters(book_chapter_width_window,  render: Render):
             dict_groups[i] = {}
         dict_groups[i][group] = 1
 
-    list_groups = [{group: 1} for group in cluster_labels]
+    list_groups = [{group: 1} for group in new_cluster_assignments]
     
     render(contents, segments, list_groups, book_chapter)
     
