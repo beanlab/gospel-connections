@@ -49,12 +49,13 @@ def generate_conference_text(year, month):
             os.makedirs(directory)
 
         # remove punctuation and spaces from title
+        safe_title = title
         for punc in punctuation:
-            title = title.replace(punc, "")
-        title = title.replace(" ", "_")
+            safe_title = safe_title.replace(punc, "")
+        safe_title = safe_title.replace(" ", "_")
 
-        with open(directory + "/" + speaker.capitalize() + "-" + title + ".txt", "w") as f:
-            f.write(text)
+        with open(directory + "/" + speaker.capitalize() + "-" + safe_title + ".txt", "w") as f:
+            f.write(title + "\n" + text)
 
 def prompt():
     print("Would you like to generate scriptures, (s), or conference talks, (c)?")
