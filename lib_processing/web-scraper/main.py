@@ -2,6 +2,7 @@ import json
 import os
 import scraper
 import unidecode
+from string import punctuation
 
 def generate_scripture_text():
 
@@ -46,5 +47,26 @@ def generate_conference_text(year, month):
         directory = "../../data/text/conference/" + str(year) + "_" + str(month)
         if not os.path.exists(directory):
             os.makedirs(directory)
-        with open(directory + "/" + title.replace(" ", "_") + "_" + speaker + ".txt", "w") as f:
+
+        # remove punctuation and spaces from title
+        for punc in punctuation:
+            title = title.replace(punc, "")
+        title = title.replace(" ", "_")
+
+        with open(directory + "/" + speaker.capitalize() + "-" + title + ".txt", "w") as f:
             f.write(text)
+
+def prompt():
+    print("Would you like to generate scriptures, (s), or conference talks, (c)?")
+    choice = input()
+    if choice == "s":
+        generate_scripture_text()
+    elif choice == "c":
+        print("What year would you like to generate? (e.g. 2023)")
+        year = input()
+        print("What month would you like to generate? (4 or 10)")
+        month = input()
+        generate_conference_text(year, month)
+
+if __name__ == "__main__":
+    prompt()
