@@ -6,4 +6,4 @@ def cos_sim(data_1, data_2):
 
 # Alternative approach using scipy, this is supposedly slower
 def cos_sim_scipy(data_1, data_2):
-    return 1 - cdist(data_1, data_2, metric='cosine')
+    return 1 - cdist(data_1, data_2, metric='cosine')  
