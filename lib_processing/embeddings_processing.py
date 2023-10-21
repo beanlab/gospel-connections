@@ -1,10 +1,12 @@
 import openai
 import os
+import csv
 import sys
 import tiktoken
 import numpy as np
 import time
 from tqdm import tqdm
+from pathlib import Path
 import scriptures_structure
 
 ADA_2_PRICING = 0.0001
@@ -88,22 +90,13 @@ def process_embeddings(file, token_width, sliding_window_increment):
             embeddings_mean = np.mean(embeddings_list, axis=0).tolist()
         else:
             embeddings_mean = embeddings_list[0].tolist()
-
-        new_file_path = ("/".join(file.split("/")[0:-1]).replace("text", "embeddings/w"+ str(token_width).zfill(3) + "_i" + str(sliding_window_increment).zfill(3) , 1))
-        file_name = file.split("/")[-1].split(".")[0]
-
-        if not os.path.exists(new_file_path):
-            os.makedirs(new_file_path)
-
-        np.savetxt(new_file_path + "/" + file_name + ".embeddings.csv", np.asarray(embeddings_list), delimiter=',')
-        np.savetxt(new_file_path + "/" + file_name + ".offsets.csv", np.asarray(indexes_list), delimiter=',', fmt="%i")
         
     price = (float(num_tokens) / 1000) * ADA_2_PRICING
     
     print('Final price: $', price)    
     print('Number tokens: ', num_tokens)
 
-    return embeddings_mean
+    return embeddings_list, indexes_list, embeddings_mean
 
 def normalize(corpus_name, token_width, sliding_window_increment, embeddings_array: np.array):
     """
@@ -132,31 +125,48 @@ def main():
     token_width = int(sys.argv[2])
     sliding_window_increment = int(sys.argv[3])
 
-    file_means = []
+    width_increment_string = 'w' + str(token_width).zfill(3) + '_i' + str(sliding_window_increment).zfill(3)
 
-    folder = '../data/text/' + corpus_name
-    for root, dirs, files in os.walk(folder):
-        for file in files:
-            file_path = os.path.join(root, file)
-            relative_path = os.path.relpath(file_path, folder).replace("\\","/")
-            full_path = folder + "/" + relative_path
-            embeddings_mean = process_embeddings(full_path, token_width, sliding_window_increment)
-            # Add mean to total mean
-            file_means.append(embeddings_mean)
+    data_path = Path('../data').absolute().resolve()
+    text_folder = data_path / 'text' / corpus_name
+    mean_folder = data_path / 'means' / width_increment_string / corpus_name
+    mean_path = mean_folder / "mean.csv"
+    mean_temp_path = mean_folder / "temp_means.csv"
 
+    if not mean_folder.exists():
+        #os.makedirs(mean_path)
+        mean_folder.mkdir(parents=True)
+
+    for path in text_folder.rglob("*"):
+        new_file_path = Path(str(path).replace("text", "embeddings/" + width_increment_string))
+        embeddings_path = new_file_path.with_suffix(".embeddings.csv")
+        offsets_path = new_file_path.with_suffix(".offsets.csv")
+        
+        # Make path if it doesn't exist yet
+        if not embeddings_path.parent.exists():
+            embeddings_path.parent.mkdir(parents=True)
+
+        # Only get embeddings if the file doesn't exist
+        if not embeddings_path.exists():
+            embeddings_list, indexes_list, embeddings_mean = process_embeddings(path, token_width, sliding_window_increment)
+
+            np.savetxt(embeddings_path, np.asarray(embeddings_list), delimiter=',')
+            np.savetxt(offsets_path, np.asarray(indexes_list), delimiter=',', fmt="%i")
+
+            # Save temporary means to temp file
+            with open(mean_temp_path, 'a', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(embeddings_mean)
+                
     # Take mean of all means for full mean
-    file_means = np.asarray(file_means)
-    corpus_mean = np.mean(file_means, axis=0).tolist()
+    temp_file_means = np.genfromtxt(mean_temp_path, delimiter=',')
+    corpus_mean = np.mean(temp_file_means, axis=0).tolist()
 
     # Save corpus mean
-    # Get new path
-    mean_path = (folder.replace("text", "means/w"+ str(token_width).zfill(3) + "_i" + str(sliding_window_increment).zfill(3), 1))
+    np.savetxt(mean_path, corpus_mean, delimiter=',')
 
-    print(mean_path)
-    if not os.path.exists(mean_path):
-        os.makedirs(mean_path)
-
-    np.savetxt(mean_path + "/" + "mean.csv", corpus_mean, delimiter=',')
+    # Remove temp file
+    mean_temp_path.unlink()
 
 
 if __name__ == "__main__":
