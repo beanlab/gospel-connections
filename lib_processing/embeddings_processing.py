@@ -137,7 +137,7 @@ def main():
         #os.makedirs(mean_path)
         mean_folder.mkdir(parents=True)
 
-    for path in text_folder.rglob("*"):
+    for path in text_folder.rglob("*.txt"):
         new_file_path = Path(str(path).replace("text", "embeddings/" + width_increment_string))
         embeddings_path = new_file_path.with_suffix(".embeddings.csv")
         offsets_path = new_file_path.with_suffix(".offsets.csv")
